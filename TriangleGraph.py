@@ -30,7 +30,7 @@ def select_index():
 
 def main():
     global best_shell,screen,shell_list,process_num,generation,original_img,catastrophe_time,cache_massage
-    while 1:
+    while generation <= total_generation:
 
         print 'generation '+ str(generation)
 
@@ -76,7 +76,19 @@ def main():
         #print shell_list
         generation+=1
 
-#
+
+def savefile():
+    global cache_massage,file_name,generation,catastrophe_time,shell_list
+    txt = open(file_name + '\\' + 'log.txt','a')
+    txt.write(cache_massage)
+    txt.write('Evolution done.\n\n\n')
+    txt.close()
+    txt = open(file_name+'\\save.txt','w')
+    txt.write(str(generation) + '\n' + str(catastrophe_time))
+    for idx in xrange(len(shell_list)):
+        txt.write('\n' + str(idx) + ":" + str(shell_list[idx].get_contain()))
+    txt.close()
+
 if __name__ == "__main__":
     try:
         last_time_passed = 0
@@ -96,6 +108,7 @@ if __name__ == "__main__":
         catastrophe_time = 1
         generation = 0
         catastrophe_generation = 100
+        total_generation = 250000
         file_name = ''
         cache_massage = ''
 
@@ -145,11 +158,6 @@ if __name__ == "__main__":
             file_name = 'saves\\' + file_list[save_idx]
             print 'Loading save form ' + file_name + '.....'
             original_img= Image.open(file_name + '\\' + 'original_img.png')
-            ####################################################################
-            #can be done by eval() easier
-            # a = '[[1,1],[1,1],[1,1],[1,1],[1,1]]'
-            # b = eval(a)
-            # print b
 
             save = open(file_name + '\\save.txt','r')
             shell_triangles_list = []
@@ -159,37 +167,13 @@ if __name__ == "__main__":
             for line_idx in xrange(2,len(save_data)):
                 line = save_data[line_idx]
                 cache_line = line[line.find(":")+1:]
-                #shell_triangles_list.append(eval(cache_line))
-                #print eval(cache_line)
                 shell_list.append(shell(original_img.size,eval(cache_line)))
-                #cache_triangles_list = cache_line.split(',')
-                #shell_triangles_list.append([[[[int(cache_triangles_list[(idx * 10)+(jdx*2)+ldx]) for ldx in xrange(2)] for jdx in xrange(3)], [int(cache_triangles_list[(idx * 10)+kdx]) for kdx in xrange(6,10)]] for idx in xrange(len(cache_triangles_list)/10)])
-            #for new_shell_triangles in shell_triangles_list:
-            #    shell_list.append(shell(original_img.size,new_shell_triangles))
-            ####################################################################
             last_similarity = [0.0,0]
             print ".....done. Start main loop."
         txt = open(file_name + '\\' + 'log.txt','a')
         txt.write('Start evolution.\n')
         txt.close()
         main()
+        savefile()
     except:
-        txt = open(file_name + '\\' + 'log.txt','a')
-        txt.write(cache_massage)
-        txt.write('Evolution done.\n\n\n')
-        txt.close()
-        txt = open(file_name+'\\save.txt','w')
-        txt.write(str(generation) + '\n' + str(catastrophe_time))
-        for idx in xrange(len(shell_list)):
-            txt.write('\n' + str(idx) + ":" + str(shell_list[idx].get_contain()))
-#            for traingle in shell_list[idx].get_contain():
-#                for contain in traingle:
-#                    for inside in contain:
-#                        try:
-#                            for loc in inside:
-#                                txt.write(str(loc) + ',')
-#                        except:
-#                            txt.write(str(inside) + ',')
-#                            sys.exc_clear()
-        txt.close()
-    #    file_list.remove(file_loc)
+        savefile()
